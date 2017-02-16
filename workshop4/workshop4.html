@@ -154,7 +154,7 @@
 			alert('BIG WIN!!!');
 		}
 		
-		jQuery('#amountWin').val(winAmount);
+		jQuery('#amountWin').val(Number(winAmount) * Number(currentBatAmount/25));
 		jQuery('#holdingSum').val(Number(currentCredit)+Number((currentBatAmount/25)*winAmount));
 		
 		spinning = false;

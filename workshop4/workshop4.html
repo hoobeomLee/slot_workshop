@@ -1,0 +1,369 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>SLOT TEST</title>
+		<script type="text/javascript" src="jquery-1.5.1.min.js"></script>
+		<script type="text/javascript" src="CustomEase.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js"></script>
+		<style type="text/css">
+	
+			#container {
+				border:5px solid #FFF20B;
+				width:500px;
+				height:300px;
+				overflow:hidden;
+			}
+ 
+			#container div {
+				position:relative;
+				width:100px;
+				float:left;
+				overflow:hidden;
+			}
+ 
+			#container div img {
+				width:100px;
+				height:100px;
+			}
+			
+			.blur {
+				filter: blur(1px); 
+				-webkit-filter: blur(1px);
+			}
+
+		</style>
+	</head>
+ 
+	<body>
+		<div id="container">
+			<div class="slot" id="slot1">
+				<img src="images/slot4.png" data-val="4"/>
+				<img src="images/slot3.png" data-val="3"/>
+				<img src="images/slot5.png" data-val="5"/>
+				<img src="images/slot3.png" data-val="4"/>
+			</div>
+			<div class="slot" id="slot2">
+				<img src="images/slot4.png" data-val="4"/>
+				<img src="images/slot3.png" data-val="3"/>
+				<img src="images/slot5.png" data-val="5"/>
+				<img src="images/slot3.png" data-val="4"/>
+			</div>
+			<div class="slot" id="slot3">
+				<img src="images/slot4.png" data-val="4"/>
+				<img src="images/slot3.png" data-val="3"/>
+				<img src="images/slot5.png" data-val="5"/>
+				<img src="images/slot3.png" data-val="4"/>
+			</div>
+			<div class="slot" id="slot4">
+				<img src="images/slot4.png" data-val="4"/>
+				<img src="images/slot3.png" data-val="3"/>
+				<img src="images/slot5.png" data-val="5"/>
+				<img src="images/slot3.png" data-val="4"/>
+			</div>
+			<div class="slot" id="slot5">
+				<img src="images/slot4.png" data-val="4"/>
+				<img src="images/slot3.png" data-val="3"/>
+				<img src="images/slot5.png" data-val="5"/>
+				<img src="images/slot3.png" data-val="4"/>
+			</div>
+		</div>
+		CREDITS &nbsp; <input type="text" value="1000" style="text-align:right; width:50px" id="holdingSum" disabled />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		BAT &nbsp; <input type="text" value="25" style="text-align:right; width:30px" id="amountBat" disabled />
+		<input type="button" value="+" onclick="setBAT('increase')"/>
+		<input type="button" value="-" onclick="setBAT('decrease')"/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		WIN &nbsp; <input type="text" value="0" style="text-align:right; width:50px" id="amountWin" disabled />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="button" onclick="spin()" value="spin" style="margin-top:25px;"/>
+	</body>
+ 
+	<script language="javascript" type="text/javascript">
+	
+	var sequenceArr = [5,0,6,3,4,5,3,4];
+	var firstItemArr = [0,0,0,0,0];
+	var spinResult = [[4,3,5],[4,3,5],[4,3,5],[4,3,5],[4,3,5]];
+	var spinning = false;
+
+	function spin(){
+		//CustomEase
+		if(spinning == true){
+			return false;
+		}
+		spinning = true;
+		var currentCredit = jQuery('#holdingSum').val();
+		var currentBatAmount = jQuery('#amountBat').val();
+		
+		jQuery('#holdingSum').val(currentCredit-currentBatAmount);
+		jQuery('#amountWin').val(0);
+		
+		CustomEase.create("spin", "M0,0 C0.122,-0.038 0.272,0.205 0.352,0.482 0.432,0.76 0.446,0.988 0.65,1 0.66,0.99 0.7,0.987 0.725,0.985 0.75,0.987 0.79,0.99 0.8,0.998 0.81,0.994 0.825,0.992 0.863,0.99 0.9,0.992 0.915,0.994 0.925,0.998 0.93,0.997 0.94,0.995 0.962,0.995 0.995,0.997 1,1 1,1");
+		
+		for(var i=1 ; i<6 ; i++){
+			preItemSetting(i);
+		}
+		
+		setTimeout(function(){jQuery('.slot').addClass('blur');}, 300);
+		setTimeout(function(){jQuery('.slot').removeClass('blur');}, 1900);
+		
+		TweenMax.to('#slot1', 4, {ease:"spin", top:"0px"});
+		TweenMax.to('#slot2', 4.3, {ease:"spin", top:"0px"});
+		TweenMax.to('#slot3', 4.6, {ease:"spin", top:"0px"});
+		TweenMax.to('#slot4', 4.9, {ease:"spin", top:"0px"});
+		TweenMax.to('#slot5', 5.2, {ease:"spin", top:"0px", onComplete:postItemSetting});
+	}
+	
+	function preItemSetting(slotNo){
+		var firstSequence = firstItemArr[slotNo-1];
+		var resultNo = Math.floor(Math.random() * 8);	// 결과 값
+		for(var i=1 ; i <= 41+resultNo ; i++){
+			var item = firstSequence;
+			if(item > 7){
+				item = item % 8;
+			}
+			jQuery('#slot'+slotNo).prepend('<img src="images/slot'+sequenceArr[item]+'.png" data-val="'+sequenceArr[item]+'" />');
+			firstSequence++;
+		}
+		var setTopValue = (jQuery('#slot'+slotNo+' img').size()-4) * -100;
+		jQuery('#slot'+slotNo).css({"top": setTopValue});
+		
+		firstItemArr[slotNo-1] = (firstItemArr[slotNo-1] + resultNo) % 8;
+	}
+	
+	function postItemSetting(){
+		for(var i=1 ; i<6 ; i++){
+			var firstItem = firstItemArr[i-1]
+			jQuery('#slot'+i+' img').remove();
+			
+			var nextItem1 = firstItem==0 ? 7:(firstItem-1);
+			var nextItem2 = nextItem1==0 ? 7:(nextItem1-1);
+			var nextItem3 = nextItem2==0 ? 7:(nextItem2-1);
+			jQuery('#slot'+i).append('<img src="images/slot'+sequenceArr[firstItem]+'.png" data-val="'+sequenceArr[firstItem]+'" />');
+			jQuery('#slot'+i).append('<img src="images/slot'+sequenceArr[nextItem1]+'.png" data-val="'+sequenceArr[nextItem1]+'" />');
+			jQuery('#slot'+i).append('<img src="images/slot'+sequenceArr[nextItem2]+'.png" data-val="'+sequenceArr[nextItem2]+'" />');
+			jQuery('#slot'+i).append('<img src="images/slot'+sequenceArr[nextItem3]+'.png" data-val="'+sequenceArr[nextItem3]+'" />');
+	
+			spinResult[i-1] = [jQuery('#slot'+i+' img').eq(0).data('val'), jQuery('#slot'+i+' img').eq(1).data('val'), jQuery('#slot'+i+' img').eq(2).data('val')];
+		}
+		
+		var winAmount = payout(spinResult);
+		var currentCredit = jQuery('#holdingSum').val();
+		var currentBatAmount = jQuery('#amountBat').val();
+		
+		if(winAmount >=100){
+			alert('BIG WIN!!!');
+		}
+		
+		jQuery('#amountWin').val(winAmount);
+		jQuery('#holdingSum').val(Number(currentCredit)+Number((currentBatAmount/25)*winAmount));
+		
+		spinning = false;
+		
+	}
+	
+	function setBAT(variation){
+		var amountArr = [25,50,75,100];			// 전체 배팅금액 배열
+		var currentBat = jQuery('#amountBat').val();	// 현재 배팅금액
+		var currentBatIndex = null;
+		
+		for(var i=0 ; i<amountArr.length ; i++){
+			if(amountArr[i] ==  currentBat){
+				currentBatIndex = i;
+				break;
+			}
+		}
+		
+		if(variation == 'increase'){
+			if(currentBatIndex < amountArr.length-1){
+				jQuery('#amountBat').val(amountArr[currentBatIndex+1]);
+			}
+		}else{
+			if(currentBatIndex > 0){
+				jQuery('#amountBat').val(amountArr[currentBatIndex-1]);
+			}
+		}
+	}
+		
+	function payout(spinResult){
+		
+		var maxResult = 0;
+		
+		var matchLine1 = [spinResult[0][0], spinResult[1][0], spinResult[2][0], spinResult[3][0], spinResult[4][0]];
+		var matchLine2 = [spinResult[0][1], spinResult[1][1], spinResult[2][1], spinResult[3][1], spinResult[4][1]];
+		var matchLine3 = [spinResult[0][2], spinResult[1][2], spinResult[2][2], spinResult[3][2], spinResult[4][2]];
+		var matchLine4 = [spinResult[0][0], spinResult[1][1], spinResult[2][2], spinResult[3][1], spinResult[4][0]];
+		var matchLine5 = [spinResult[0][2], spinResult[1][1], spinResult[2][0], spinResult[3][1], spinResult[4][2]];
+		
+		var result = [validateMatchLine(matchLine1), validateMatchLine(matchLine2), validateMatchLine(matchLine3), validateMatchLine(matchLine4), validateMatchLine(matchLine5)];
+		
+		for(var i=0 ; i<result.length ; i++){
+			if(maxResult <= result[i]){
+				maxResult = result[i];
+			}
+		}
+		
+		return maxResult;
+	}
+	
+	function validateMatchLine(matchLine){
+		
+		var prevItem = 2;		//존재하지 않는 item 숫자로 초기화
+		var currentItem = 2;	
+		
+		var cashPrize = 0;
+		
+		var isWin = true;
+		
+		var isContinuitySame7 = true;
+		
+		var setWildArr = matchLine;
+		
+		for(var i=1 ; i < setWildArr.length ; i++){
+			prevItem = setWildArr[i-1];
+			currentItem = setWildArr[i];	
+			
+			if(wildCheck(currentItem)){
+				setWildArr[i] = prevItem;
+				currentItem = prevItem;	// 현재 원소가 wild이면 앞의 원소의 값으로 치환한다.
+			}
+			
+			if((sevenCheck(prevItem)&&sevenCheck(currentItem))){
+				// 7과 7연결
+				if((prevItem==currentItem)&&isContinuitySame7){
+					if(i==2){	//연속 3개 연결 
+						if(currentItem==3){	//red7
+							cashPrize = 8;
+						}else if(currentItem==4){	//blue7
+							cashPrize = 6;
+						}else if(currentItem==5){	//white7
+							cashPrize = 4;
+						}
+					}else if(i==3){	//연속 4개 연결 
+						if(currentItem==3){	//red7
+							cashPrize = 25;
+						}else if(currentItem==4){	//blue7
+							cashPrize = 20;
+						}else if(currentItem==5){	//white7
+							cashPrize = 12;
+						}
+					}else if(i==4){	//연속 5개 연결 
+						if(currentItem==3){	//red7
+							cashPrize = 100;
+						}else if(currentItem==4){	//blue7
+							cashPrize = 60;
+						}else if(currentItem==5){	//white7
+							cashPrize = 40;
+						}
+					}					
+				}else{
+					isContinuitySame7 = false;
+					// 서로 다른 연속 7
+					if(i==2){	//연속 3개 연결 
+						cashPrize = 2;
+					}else if(i==3){	//연속 4개 연결 
+						cashPrize = 7;
+					}else if(i==4){	//연속 5개 연결 
+						cashPrize = 25;
+					}
+				}
+				
+			}else if((cherryCheck(prevItem)&&cherryCheck(currentItem))){
+				// cherry와 cherry 연결
+				if(i==2){	//cherry 연속 3개 연결 
+					cashPrize = 1;
+				}else if(i==3){	//cherry 연속 4개 연결 
+					cashPrize = 3;
+				}else if(i==4){	//cherry 연속 5개 연결 
+					cashPrize = 10;
+				}
+			}else if(wildCheck(prevItem)&&sevenCheck(currentItem)){
+				// wild 연결 이후 7연결 
+				setWildArr = setWild(setWildArr, i, currentItem);
+				if(i==2){
+					if(currentItem==3){
+						cashPrize = 8;
+					}else if(currentItem==4){
+						cashPrize = 6;
+					}else if(currentItem==5){
+						cashPrize = 4;
+					}
+				}else if(i==3){
+					if(currentItem==3){
+						cashPrize = 25;
+					}else if(currentItem==4){
+						cashPrize = 20;
+					}else if(currentItem==5){
+						cashPrize = 12;
+					}
+				}else if(i==4){
+					if(currentItem==3){
+						cashPrize = 100;
+					}else if(currentItem==4){
+						cashPrize = 60;
+					}else if(currentItem==5){
+						cashPrize = 40;
+					}
+				}
+			}else if(wildCheck(prevItem)&&cherryCheck(currentItem)){
+				// wild 연결 이후 cherry연결 
+				setWildArr = setWild(setWildArr, i, currentItem);
+				if(i==2){
+					cashPrize = 1;
+				}else if(i==3){
+					cashPrize = 3;
+				}else if(i==4){
+					cashPrize = 10;
+				}
+			}else if(wildCheck(prevItem)&&wildCheck(currentItem)){
+				// wild - wild 연결
+				if(i==4){
+					cashPrize = 1000;
+				}
+			}else{
+				isWin = false;
+			}
+			
+			if(!isWin){
+				break;
+			}
+		}
+		return cashPrize;
+	}
+	
+	// 모든 앞의 원소들이 wild라면 맨 마지막 원소로 통일 
+	function setWild(matchLine, index, item){
+		for(var i=0 ; i<=index ; i++){
+			matchLine[i] = item;
+		}
+		return matchLine;
+	}
+	
+	// 색상 관계없이 7인지 구분 
+	function sevenCheck(item){
+		var result = false;
+		if(item==3 || item==4 || item==5){
+			result = true;
+		}
+		return result;
+	}
+	
+	// wild 구분 
+	function wildCheck(item){
+		var result = false;
+		if(item==0){
+			result = true;
+		}
+		return result;
+	}
+	
+	// cherry 구분 
+	function cherryCheck(item){
+		var result = false;
+		if(item==6){
+			result = true;
+		}
+		return result;
+	}
+
+	</script>
+</html>
